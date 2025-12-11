@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 env:
-  TF_ROOT: terraform
+  TF_ROOT: ./ # terraform
   TF_WORKSPACE: default
   AWS_REGION: ap-southeast-1
 
