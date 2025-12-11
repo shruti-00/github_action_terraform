@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "terraformtushar123.com"
-    key    = "app/flipkart/qa/terraform.tfstate"
+    bucket = "terraform-s3-backend-amdocs"
+    key    = "env/prod/"
     region = "ap-south-1"
     #use_lockfile = "true"
   }
