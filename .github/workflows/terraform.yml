@@ -23,7 +23,7 @@ permissions:
 env:
   TF_ROOT: terraform
   TF_WORKSPACE: default
-  AWS_REGION: ap-south-1
+  AWS_REGION: ap-southeast-1
 
 jobs:
 
