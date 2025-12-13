@@ -76,7 +76,7 @@ jobs:
   terraform-apply:
     needs: terraform
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply'if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
     environment: production
 
     steps:
