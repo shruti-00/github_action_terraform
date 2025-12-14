@@ -1,4 +1,3 @@
-
 name: Terraform CI/CD
 
 on:
@@ -21,7 +20,7 @@ permissions:
   contents: read
 
 env:
-  TF_ROOT: ./ # terraform
+  TF_ROOT: terraform
   TF_WORKSPACE: default
   AWS_REGION: ap-south-1
 
@@ -51,7 +50,7 @@ jobs:
 
       - name: Terraform Format
         working-directory: ${{ env.TF_ROOT }}
-        run: terraform fmt -recursive
+        run: terraform fmt -check -recursive
 
       - name: Terraform Validate
         working-directory: ${{ env.TF_ROOT }}
@@ -76,7 +75,7 @@ jobs:
   terraform-apply:
     needs: terraform
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
+    if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply'
     environment: production
 
     steps:
