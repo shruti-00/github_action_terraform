@@ -69,7 +69,7 @@ jobs:
         run: |
           terraform plan \
           -input=false \
-          -var-file=terraform.tfvars \
+          -var-file=dev.tfvars \
           -out=tfplan.binary
           terraform show -json tfplan.binary > tfplan.json
 
