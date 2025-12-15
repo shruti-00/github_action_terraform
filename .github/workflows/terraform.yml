@@ -68,9 +68,9 @@ jobs:
         working-directory: ${{ env.TF_ROOT }}
         run: |
           terraform plan \
-          -input=false \
-          -var-file=dev.tfvars \
-          -out=tfplan.binary
+            -input=false \
+            -var-file=dev.tfvars \
+            -out=tfplan.binary
           terraform show -json tfplan.binary > tfplan.json
 
 
@@ -81,7 +81,7 @@ jobs:
           path: |
             ${{ env.TF_ROOT }}/tfplan.binary
             ${{ env.TF_ROOT }}/tfplan.json
-
+            ${{ env.TF_ROOT }}/.terraform.lock.hcl  # include lock file
 
   terraform-apply:
     needs: terraform
@@ -109,6 +109,10 @@ jobs:
         with:
           name: terraform-plan
           path: ${{ env.TF_ROOT }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_ROOT }}
+        run: terraform init -input=false
 
       - name: Terraform Apply
         working-directory: ${{ env.TF_ROOT }}
