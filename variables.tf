@@ -1,10 +1,10 @@
 variable "name" {
   type        = string
-  description = "eks vpc"
+  description = "dev vpc"
 }
 variable "cidr_block" {
   type        = string
-  description = "eks vpc"
+  description = "dev vpc"
 }
 variable "tags" {
   type        = map(string)
