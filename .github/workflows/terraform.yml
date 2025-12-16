@@ -38,14 +38,31 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Trivy Scan Terraform Code
+      - name: Trivy Scan Terraform (Table Output)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: config
+          scan-ref: ${{ env.TF_ROOT }}
+          severity: HIGH,CRITICAL
+          exit-code: 0
+          format: table
+
+      - name: Trivy Scan Terraform (HTML Report)
         uses: aquasecurity/trivy-action@0.20.0
         with:
           scan-type: config
           scan-ref: ${{ env.TF_ROOT }}
           severity: HIGH,CRITICAL
           exit-code: 1
-          format: table
+          format: template
+          template: "@contrib/html.tpl"
+          output: trivy-report.html
+
+      - name: Upload Trivy HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.html
 
 # =====================================================
 # 2️⃣ STAGE: TERRAFORM PLAN
