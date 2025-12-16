@@ -38,7 +38,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Trivy table output (console)
+      # ---------------------------------------------
+      # Download Trivy HTML Template (REQUIRED)
+      # ---------------------------------------------
+      - name: Download Trivy HTML Template
+        run: |
+          mkdir -p templates
+          curl -sSL \
+            https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl \
+            -o templates/html.tpl
+
+      # Console output (table)
       - name: Trivy Scan Terraform (Table)
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -48,7 +58,7 @@ jobs:
           exit-code: 1
           format: table
 
-      # Trivy HTML report (FIXED TEMPLATE PATH)
+      # HTML report (LOCAL TEMPLATE — FIXED)
       - name: Trivy Scan Terraform (HTML Report)
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -57,7 +67,7 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 1
           format: template
-          template: "@https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl"
+          template: "@/templates/html.tpl"
           output: trivy-report.html
 
       - name: Upload Trivy HTML Report
