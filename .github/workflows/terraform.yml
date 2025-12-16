@@ -1,4 +1,4 @@
-name: Terraform CI/CD
+name: Terraform CI/CD with Trivy
 
 on:
   push:
@@ -18,16 +18,42 @@ on:
 permissions:
   id-token: write
   contents: read
+  security-events: write
 
 env:
-  TF_ROOT: ./ #terraform
+  TF_ROOT: ./
   TF_WORKSPACE: default
   AWS_REGION: ap-south-1
 
 jobs:
 
-  terraform:
+# =====================================================
+# 1️⃣ STAGE: TRIVY SCAN
+# =====================================================
+  trivy:
+    name: Trivy IaC Scan
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Trivy Scan Terraform Code
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: config
+          scan-ref: ${{ env.TF_ROOT }}
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          format: table
+
+# =====================================================
+# 2️⃣ STAGE: TERRAFORM PLAN
+# =====================================================
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: trivy
 
     steps:
       - name: Checkout Repo
@@ -48,23 +74,11 @@ jobs:
         working-directory: ${{ env.TF_ROOT }}
         run: terraform init -input=false
 
-      - name: Terraform Format
-        working-directory: ${{ env.TF_ROOT }}
-        run: terraform fmt -recursive
-
       - name: Terraform Validate
         working-directory: ${{ env.TF_ROOT }}
         run: terraform validate
 
-      # - name: Terraform Plan
-      #   id: plan
-      #   working-directory: ${{ env.TF_ROOT }}
-      #   run: |
-      #     terraform plan -out=tfplan.binary
-      #     terraform show -json tfplan.binary > tfplan.json
-
       - name: Terraform Plan
-        id: plan
         working-directory: ${{ env.TF_ROOT }}
         run: |
           terraform plan \
@@ -73,7 +87,6 @@ jobs:
             -out=tfplan.binary
           terraform show -json tfplan.binary > tfplan.json
 
-
       - name: Upload Plan Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -81,11 +94,15 @@ jobs:
           path: |
             ${{ env.TF_ROOT }}/tfplan.binary
             ${{ env.TF_ROOT }}/tfplan.json
-            ${{ env.TF_ROOT }}/.terraform.lock.hcl  # include lock file
+            ${{ env.TF_ROOT }}/.terraform.lock.hcl
 
+# =====================================================
+# 3️⃣ STAGE: TERRAFORM APPLY
+# =====================================================
   terraform-apply:
-    needs: terraform
+    name: Terraform Apply
     runs-on: ubuntu-latest
+    needs: terraform-plan
     if: github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply'
     environment: production
 
