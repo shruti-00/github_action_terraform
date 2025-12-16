@@ -48,16 +48,6 @@ jobs:
             https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl \
             -o templates/html.tpl
 
-      # Console output (table)
-      - name: Trivy Scan Terraform (Table)
-        uses: aquasecurity/trivy-action@0.20.0
-        with:
-          scan-type: config
-          scan-ref: ${{ env.TF_ROOT }}
-          severity: HIGH,CRITICAL
-          exit-code: 1
-          format: table
-
       # HTML report (LOCAL TEMPLATE — FIXED)
       - name: Trivy Scan Terraform (HTML Report)
         uses: aquasecurity/trivy-action@0.20.0
@@ -75,6 +65,17 @@ jobs:
         with:
           name: trivy-report
           path: trivy-report.html
+
+
+      # Console output (table)
+      - name: Trivy Scan Terraform (Table)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: config
+          scan-ref: ${{ env.TF_ROOT }}
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          format: table
 
 # =====================================================
 # 2️⃣ STAGE: TERRAFORM PLAN
